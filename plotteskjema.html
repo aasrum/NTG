@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plotteskjema NTG-Geilo v18</title>
+    <title>Plotteskjema NTG-Geilo v19</title>
     <style>
         /* --- GENERELT --- */
         body {
@@ -139,8 +139,17 @@
             font-weight: bold; font-size: 12px; width: 40px; white-space: nowrap;
         }
 
+        /* Data Container (Uten strek) - brukes på navn/nr som er utfylt */
         .data-container { flex-grow: 1; padding-left: 5px; }
         
+        /* Line Border (Med strek) - brukes på tid og manuelle felt */
+        .line-border {
+            flex-grow: 1;
+            border-bottom: 1px solid #000;
+            height: 18px;
+            min-width: 50px;
+        }
+
         .data-value {
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
@@ -167,7 +176,6 @@
             height: 55px;
         }
 
-        /* SIRKEL (55px) */
         .circle {
             width: 55px; height: 55px;
             border: 2px solid #000; border-radius: 50%;
@@ -180,7 +188,7 @@
             font-size: 20px; font-weight: 300;
         }
 
-        /* GRÅ STREK MELLOM SIRKLENE (Container for boksen) */
+        /* Grå strek mellom sirklene */
         .target-divider {
             width: 1px;
             background-color: #ccc; 
@@ -191,7 +199,7 @@
             overflow: visible; 
         }
 
-        /* DEN ENE BOKSEN I MIDTEN */
+        /* Den lille boksen */
         .pos-box-center {
             position: absolute;
             width: 14px;
@@ -199,13 +207,12 @@
             border: 1px solid #000;
             background-color: #fff;
             z-index: 10;
-            /* Posisjonering */
             top: -20px; 
             left: 50%;
             transform: translateX(-50%); 
         }
 
-        /* --- DELELINJE MELLOM UTØVERE --- */
+        /* --- DELELINJE --- */
         .center-divider {
             width: 2px; background-color: #000; height: 65px; 
             margin: 0 10px; flex-shrink: 0; align-self: stretch; 
@@ -234,8 +241,7 @@
                 box-shadow: none; padding-bottom: 25mm; 
             }
 
-            /* SKJUL LOGO I TOPPEN PÅ PRINT */
-            .top-logo { display: none; }
+            .top-logo { display: none; } /* Skjul topplogo på print */
 
             .page-break { border: none; margin: 0; height: 0; }
             .page-break::after { display: none; }
@@ -421,11 +427,39 @@
             }
             if (maleClasses.length > 0) renderClassList(maleClasses);
 
+            // --- LEGG TIL MANUELL SEKSJON TIL SLUTT ---
+            renderManualSection(container);
+
             statusDiv.innerText = `Klar! ${totalAthletes} utøvere.`;
             statusDiv.style.color = "green";
             printBtn.classList.remove('hidden');
         }
 
+        // Funksjon for å lage blanke rader
+        function renderManualSection(container) {
+            const header = document.createElement('h2');
+            header.className = 'class-header';
+            header.innerText = "Ekstra";
+            container.appendChild(header);
+
+            const classContainer = document.createElement('div');
+            classContainer.className = 'sheet-container';
+
+            // 4 rader = 8 plasser
+            for (let i = 0; i < 4; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                
+                row.innerHTML += createBlankAthleteHTML();
+                row.innerHTML += `<div class="center-divider"></div>`;
+                row.innerHTML += createBlankAthleteHTML();
+                
+                classContainer.appendChild(row);
+            }
+            container.appendChild(classContainer);
+        }
+
+        // HTML for en utøver med data
         function createAthleteHTML(athlete) {
             return `
                 <div class="athlete-group">
@@ -443,19 +477,46 @@
                             <div class="data-container"><span class="data-value">${athlete.startTid}</span></div>
                         </div>
                     </div>
-                    
-                    <div class="targets-wrapper">
-                        <div class="target-unit">
-                            <div class="circle"></div>
-                        </div>
+                    ${createTargetsHTML()}
+                </div>
+            `;
+        }
 
-                        <div class="target-divider">
-                            <div class="pos-box-center"></div>
+        // HTML for blank utøver (med skrivelinjer)
+        function createBlankAthleteHTML() {
+            return `
+                <div class="athlete-group">
+                    <div class="info-box">
+                        <div class="input-row">
+                            <span class="label">Nr:</span>
+                            <div class="line-border"></div>
                         </div>
+                        <div class="input-row">
+                            <span class="label">Navn:</span>
+                            <div class="line-border"></div>
+                        </div>
+                        <div class="input-row">
+                            <span class="label">Tid:</span>
+                            <div class="line-border"></div>
+                        </div>
+                    </div>
+                    ${createTargetsHTML()}
+                </div>
+            `;
+        }
 
-                        <div class="target-unit">
-                            <div class="circle"></div>
-                        </div>
+        // Felles HTML for sirkel-oppsettet
+        function createTargetsHTML() {
+            return `
+                <div class="targets-wrapper">
+                    <div class="target-unit">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="target-divider">
+                        <div class="pos-box-center"></div>
+                    </div>
+                    <div class="target-unit">
+                        <div class="circle"></div>
                     </div>
                 </div>
             `;
