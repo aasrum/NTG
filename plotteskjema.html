@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plotteskjema NTG-Geilo v18</title>
+    <style>
+        /* --- GENERELT --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+        /* --- KONTROLLPANEL --- */
+        #control-panel {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+            text-align: center;
+        }
+
+        .panel-header-logo {
+            max-width: 220px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .panel-title {
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #333;
+            text-transform: uppercase;
+            font-size: 20px;
+            border-bottom: 2px solid #d31238;
+            padding-bottom: 20px;
+            display: inline-block;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .input-group:last-child { border-bottom: none; }
+        .input-group label { font-weight: bold; display: block; margin-bottom: 8px; font-size: 16px; }
+
+        .instruction-text { font-size: 14px; color: #555; margin-bottom: 10px; line-height: 1.4; }
+        .instruction-img {
+            max-width: 100%; height: auto; border: 1px solid #ccc;
+            border-radius: 4px; margin-bottom: 10px; display: block;
+        }
+
+        input[type="text"], input[type="file"] {
+            padding: 10px; width: 100%; background: #fafafa;
+            border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+
+        .action-btn {
+            background-color: #d31238; color: white; border: none;
+            padding: 12px 30px; font-size: 16px; border-radius: 5px;
+            cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
+        }
+        .action-btn:hover { background-color: #a50e2c; }
+        .hidden { display: none; }
+
+        /* --- DOKUMENT-VISNING (Skjerm) --- */
+        #document-preview {
+            background-color: white;
+            padding: 15mm;
+            padding-bottom: 30mm;
+            margin: 0 auto;
+            max-width: 21cm;
+            min-height: 29.7cm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* --- HEADER I SKJEMA --- */
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #000;
+            padding-bottom: 10px;
+        }
+        .top-logo {
+            max-width: 280px; height: auto; display: block; margin: 0 auto 15px auto;
+        }
+        h1.main-title {
+            text-align: center; font-size: 28px; text-transform: uppercase;
+            margin: 0; letter-spacing: 1px; min-height: 40px;
+        }
+
+        /* --- LOGO I BUNN (Print) --- */
+        #page-footer { display: none; }
+
+        /* --- KLASSE OVERSKRIFT --- */
+        h2.class-header {
+            font-size: 18px; 
+            margin-top: 30px; margin-bottom: 5px; padding: 5px 10px;
+            background-color: #f4f4f4; border-left: 5px solid #d31238;
+            page-break-after: avoid; 
+        }
+
+        /* --- RADER --- */
+        .sheet-container {
+            display: flex; flex-direction: column; border-top: 2px solid #000;
+        }
+        .row {
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 2px solid #000; padding: 8px 0;
+            page-break-inside: avoid;
+        }
+
+        .athlete-group {
+            display: flex; align-items: center; flex-grow: 1;
+            width: 48%; justify-content: space-between;
+        }
+        .athlete-group.empty { visibility: hidden; }
+
+        .info-box {
+            flex-grow: 1; 
+            padding-right: 10px; 
+            min-width: 0; 
+        }
+
+        .input-row {
+            display: flex; align-items: baseline; width: 100%; margin-bottom: 4px;
+        }
+        .input-row:last-child { margin-bottom: 0; }
+
+        .label {
+            font-weight: bold; font-size: 12px; width: 40px; white-space: nowrap;
+        }
+
+        .data-container { flex-grow: 1; padding-left: 5px; }
+        
+        .data-value {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 1.1;
+            white-space: normal;
+            word-wrap: break-word;
+            display: block;
+        }
+
+        /* --- SKIVE-SEKSJON --- */
+        .targets-wrapper {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0; 
+            min-width: 170px;
+            justify-content: flex-end;
+            padding-right: 15px; 
+        }
+
+        .target-unit {
+            position: relative;
+            width: 55px;
+            height: 55px;
+        }
+
+        /* SIRKEL (55px) */
+        .circle {
+            width: 55px; height: 55px;
+            border: 2px solid #000; border-radius: 50%;
+            position: relative; background-color: #fff;
+            box-sizing: border-box;
+        }
+        .circle::after {
+            content: "+"; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -55%); color: #ccc;
+            font-size: 20px; font-weight: 300;
+        }
+
+        /* GRÅ STREK MELLOM SIRKLENE (Container for boksen) */
+        .target-divider {
+            width: 1px;
+            background-color: #ccc; 
+            height: 40px; 
+            margin: 0 22px; 
+            flex-shrink: 0;
+            position: relative; 
+            overflow: visible; 
+        }
+
+        /* DEN ENE BOKSEN I MIDTEN */
+        .pos-box-center {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 1px solid #000;
+            background-color: #fff;
+            z-index: 10;
+            /* Posisjonering */
+            top: -20px; 
+            left: 50%;
+            transform: translateX(-50%); 
+        }
+
+        /* --- DELELINJE MELLOM UTØVERE --- */
+        .center-divider {
+            width: 2px; background-color: #000; height: 65px; 
+            margin: 0 10px; flex-shrink: 0; align-self: stretch; 
+        }
+
+        /* --- SIDESKIFT --- */
+        .page-break {
+            page-break-before: always; break-before: page;
+            height: 50px; display: block; border-top: 2px dashed #999;
+            margin: 20px 0; position: relative;
+        }
+        .page-break::after {
+            content: "SIDESKIFT (Skiller K og M)";
+            position: absolute; top: -12px; left: 50%;
+            transform: translateX(-50%); background: #fff;
+            padding: 0 10px; color: #999; font-size: 12px;
+        }
+
+        /* --- UTSKRIFTSREGLER --- */
+        @media print {
+            body { background-color: white; margin: 0; padding: 0; }
+            #control-panel { display: none; }
+            
+            #document-preview {
+                width: 100%; max-width: none; margin: 0; padding: 0;
+                box-shadow: none; padding-bottom: 25mm; 
+            }
+
+            /* SKJUL LOGO I TOPPEN PÅ PRINT */
+            .top-logo { display: none; }
+
+            .page-break { border: none; margin: 0; height: 0; }
+            .page-break::after { display: none; }
+            
+            #page-footer {
+                display: flex !important; position: fixed; bottom: 0;
+                left: 0; right: 0; height: 20mm; 
+                justify-content: center; align-items: center;
+                background: white; z-index: 1000;
+            }
+            #page-footer img { max-height: 15mm; max-width: 300px; }
+
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="control-panel">
+        <img src="logo.png" alt="NTG Logo" class="panel-header-logo" onerror="this.style.display='none'">
+        <br>
+        <h2 class="panel-title">Plotteskjema for NTG Skiskyting</h2>
+        
+        <div class="input-group">
+            <label for="eventName">Arrangementsnavn (Valgfritt):</label>
+            <input type="text" id="eventName" placeholder="F.eks. Norgescup Geilo" autocomplete="off">
+            <div class="instruction-text">Standard: "Plotteskjema for NTG Skiskyting".</div>
+        </div>
+
+        <div class="input-group">
+            <label for="xmlInput">Last opp startliste (XML):</label>
+            <div class="instruction-text">
+                Last ned <strong>ET6 deltakerliste</strong> fra EQ Timing under filer på deltakersiden.
+            </div>
+            <img src="eq.png" alt="Viser filvalg på EQ Timing" class="instruction-img" onerror="this.style.display='none'">
+            <input type="file" id="xmlInput" accept=".xml">
+        </div>
+
+        <button id="printBtn" class="action-btn hidden" onclick="window.print()">Skriv ut skjema</button>
+        <div id="statusMsg" style="margin-top:15px; font-weight: bold;"></div>
+    </div>
+
+    <div id="page-footer">
+        <img src="logo.png" alt="NTG Logo">
+    </div>
+
+    <div id="document-preview">
+        <div class="header-section">
+            <img src="logo.png" alt="NTG Logo" class="top-logo" onerror="this.style.display='none'">
+            <h1 class="main-title" id="pageTitle">Plotteskjema for NTG Skiskyting</h1>
+        </div>
+
+        <div id="dynamic-content"></div>
+    </div>
+
+    <script>
+        const titleInput = document.getElementById('eventName');
+        const pageTitle = document.getElementById('pageTitle');
+        const defaultTitle = "Plotteskjema for NTG Skiskyting";
+
+        titleInput.addEventListener('input', function() {
+            const val = this.value.trim();
+            pageTitle.innerText = val.length > 0 ? val : defaultTitle;
+        });
+
+        document.getElementById('xmlInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    processXML(e.target.result);
+                } catch (err) {
+                    alert("Feil ved lesing av filen.");
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function processXML(xmlText) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            const starts = xmlDoc.getElementsByTagName("start");
+            
+            const rawClasses = {};
+            let totalAthletes = 0;
+
+            for (let i = 0; i < starts.length; i++) {
+                const s = starts[i];
+                const team = (s.getAttribute("team") || "").toLowerCase();
+                const teamAbb = (s.getAttribute("teamabb") || "").toLowerCase();
+                
+                if (team.includes("ntg-geilo") || teamAbb.includes("ntg-geilo")) {
+                    const klasse = s.getAttribute("klasse");
+                    const startNr = parseInt(s.getAttribute("startno"), 10) || 99999;
+                    const startTid = s.getAttribute("starttid") || "";
+
+                    const utover = {
+                        nr: startNr, 
+                        nrString: s.getAttribute("startno"), 
+                        navn: s.getAttribute("fornavn") + " " + s.getAttribute("etternavn"),
+                        startTid: startTid 
+                    };
+
+                    if (!rawClasses[klasse]) {
+                        rawClasses[klasse] = [];
+                    }
+                    rawClasses[klasse].push(utover);
+                    totalAthletes++;
+                }
+            }
+
+            const container = document.getElementById('dynamic-content');
+            container.innerHTML = ""; 
+            const statusDiv = document.getElementById('statusMsg');
+            const printBtn = document.getElementById('printBtn');
+
+            if (totalAthletes === 0) {
+                statusDiv.innerText = "Ingen utøvere funnet.";
+                statusDiv.style.color = "red";
+                printBtn.classList.add('hidden');
+                return;
+            }
+
+            let classList = Object.keys(rawClasses).map(className => {
+                const athletes = rawClasses[className];
+                athletes.sort((a, b) => a.nr - b.nr);
+                const minStartNr = athletes.length > 0 ? athletes[0].nr : 99999;
+
+                return {
+                    name: className,
+                    athletes: athletes,
+                    minStartNr: minStartNr,
+                    isFemale: className.trim().toUpperCase().startsWith('K')
+                };
+            });
+
+            const femaleClasses = classList.filter(c => c.isFemale);
+            const maleClasses = classList.filter(c => !c.isFemale);
+
+            femaleClasses.sort((a, b) => a.minStartNr - b.minStartNr);
+            maleClasses.sort((a, b) => a.minStartNr - b.minStartNr);
+
+            function renderClassList(list) {
+                list.forEach(classObj => {
+                    const header = document.createElement('h2');
+                    header.className = 'class-header';
+                    header.innerText = "Klasse: " + classObj.name;
+                    container.appendChild(header);
+
+                    const classContainer = document.createElement('div');
+                    classContainer.className = 'sheet-container';
+
+                    const athletes = classObj.athletes;
+                    for (let i = 0; i < athletes.length; i += 2) {
+                        const left = athletes[i];
+                        const right = athletes[i+1];
+
+                        const row = document.createElement('div');
+                        row.className = 'row';
+
+                        row.innerHTML += createAthleteHTML(left);
+                        row.innerHTML += `<div class="center-divider"></div>`;
+
+                        if (right) {
+                            row.innerHTML += createAthleteHTML(right);
+                        } else {
+                            row.innerHTML += `<div class="athlete-group empty"></div>`;
+                        }
+                        classContainer.appendChild(row);
+                    }
+                    container.appendChild(classContainer);
+                });
+            }
+
+            if (femaleClasses.length > 0) renderClassList(femaleClasses);
+            if (femaleClasses.length > 0 && maleClasses.length > 0) {
+                const pageBreak = document.createElement('div');
+                pageBreak.className = 'page-break';
+                container.appendChild(pageBreak);
+            }
+            if (maleClasses.length > 0) renderClassList(maleClasses);
+
+            statusDiv.innerText = `Klar! ${totalAthletes} utøvere.`;
+            statusDiv.style.color = "green";
+            printBtn.classList.remove('hidden');
+        }
+
+        function createAthleteHTML(athlete) {
+            return `
+                <div class="athlete-group">
+                    <div class="info-box">
+                        <div class="input-row">
+                            <span class="label">Nr:</span>
+                            <div class="data-container"><span class="data-value">${athlete.nrString}</span></div>
+                        </div>
+                        <div class="input-row">
+                            <span class="label">Navn:</span>
+                            <div class="data-container"><span class="data-value">${athlete.navn}</span></div>
+                        </div>
+                        <div class="input-row">
+                            <span class="label">Tid:</span>
+                            <div class="data-container"><span class="data-value">${athlete.startTid}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="targets-wrapper">
+                        <div class="target-unit">
+                            <div class="circle"></div>
+                        </div>
+
+                        <div class="target-divider">
+                            <div class="pos-box-center"></div>
+                        </div>
+
+                        <div class="target-unit">
+                            <div class="circle"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
