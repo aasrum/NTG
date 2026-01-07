@@ -3,331 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plotteskjema NTG-Geilo v19</title>
+    <title>Plotteskjema (Auto-generert)</title>
     <style>
-        /* --- GENERELT --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-            color: #000;
-        }
-
-        /* --- KONTROLLPANEL --- */
-        #control-panel {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: 0 auto 40px auto;
-            text-align: center;
-        }
-
-        .panel-header-logo {
-            max-width: 220px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-        .panel-title {
-            margin-top: 0;
-            margin-bottom: 30px;
-            color: #333;
-            text-transform: uppercase;
-            font-size: 20px;
-            border-bottom: 2px solid #d31238;
-            padding-bottom: 20px;
-            display: inline-block;
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-        }
+        /* --- STILARK (CSS) --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; color: #000; }
+        
+        /* Kontrollpanel */
+        #control-panel { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto 40px auto; text-align: center; }
+        .panel-header-logo { max-width: 220px; height: auto; margin-bottom: 10px; }
+        .panel-title { margin-top: 0; margin-bottom: 30px; color: #333; text-transform: uppercase; font-size: 20px; border-bottom: 2px solid #d31238; padding-bottom: 20px; display: inline-block; }
+        .input-group { margin-bottom: 25px; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         .input-group:last-child { border-bottom: none; }
         .input-group label { font-weight: bold; display: block; margin-bottom: 8px; font-size: 16px; }
-
         .instruction-text { font-size: 14px; color: #555; margin-bottom: 10px; line-height: 1.4; }
-        .instruction-img {
-            max-width: 100%; height: auto; border: 1px solid #ccc;
-            border-radius: 4px; margin-bottom: 10px; display: block;
-        }
-
-        input[type="text"], input[type="file"] {
-            padding: 10px; width: 100%; background: #fafafa;
-            border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
-        }
-
-        .action-btn {
-            background-color: #d31238; color: white; border: none;
-            padding: 12px 30px; font-size: 16px; border-radius: 5px;
-            cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
-        }
+        .instruction-img { max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px; display: block; }
+        input[type="text"], input[type="file"] { padding: 10px; width: 100%; background: #fafafa; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .action-btn { background-color: #d31238; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
         .action-btn:hover { background-color: #a50e2c; }
         .hidden { display: none; }
 
-        /* --- DOKUMENT-VISNING (Skjerm) --- */
-        #document-preview {
-            background-color: white;
-            padding: 15mm;
-            padding-bottom: 30mm;
-            margin: 0 auto;
-            max-width: 21cm;
-            min-height: 29.7cm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        /* --- HEADER I SKJEMA --- */
-        .header-section {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #000;
-            padding-bottom: 10px;
-        }
-        .top-logo {
-            max-width: 280px; height: auto; display: block; margin: 0 auto 15px auto;
-        }
-        h1.main-title {
-            text-align: center; font-size: 28px; text-transform: uppercase;
-            margin: 0; letter-spacing: 1px; min-height: 40px;
-        }
-
-        /* --- LOGO I BUNN (Print) --- */
-        #page-footer { display: none; }
-
-        /* --- KLASSE OVERSKRIFT --- */
-        h2.class-header {
-            font-size: 18px; 
-            margin-top: 30px; margin-bottom: 5px; padding: 5px 10px;
-            background-color: #f4f4f4; border-left: 5px solid #d31238;
-            page-break-after: avoid; 
-        }
-
-        /* --- RADER --- */
-        .sheet-container {
-            display: flex; flex-direction: column; border-top: 2px solid #000;
-        }
-        .row {
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 2px solid #000; padding: 8px 0;
-            page-break-inside: avoid;
-        }
-
-        .athlete-group {
-            display: flex; align-items: center; flex-grow: 1;
-            width: 48%; justify-content: space-between;
-        }
-        .athlete-group.empty { visibility: hidden; }
-
-        .info-box {
-            flex-grow: 1; 
-            padding-right: 10px; 
-            min-width: 0; 
-        }
-
-        .input-row {
-            display: flex; align-items: baseline; width: 100%; margin-bottom: 4px;
-        }
-        .input-row:last-child { margin-bottom: 0; }
-
-        .label {
-            font-weight: bold; font-size: 12px; width: 40px; white-space: nowrap;
-        }
-
-        /* Data Container (Uten strek) - brukes på navn/nr som er utfylt */
-        .data-container { flex-grow: 1; padding-left: 5px; }
+        /* Dokumentvisning */
+        #document-preview { background-color: white; padding: 10mm; margin: 0 auto; max-width: 21cm; min-height: 29.7cm; box-shadow: 0 0 10px rgba(0,0,0,0.1); box-sizing: border-box; position: relative; }
         
-        /* Line Border (Med strek) - brukes på tid og manuelle felt */
-        .line-border {
-            flex-grow: 1;
-            border-bottom: 1px solid #000;
-            height: 18px;
-            min-width: 50px;
-        }
+        /* Header og innhold */
+        .header-section { text-align: center; margin-bottom: 20px; border-bottom: 3px solid #000; padding-bottom: 10px; }
+        .top-logo { max-width: 280px; height: auto; display: block; margin: 0 auto 15px auto; }
+        h1.main-title { text-align: center; font-size: 28px; text-transform: uppercase; margin: 0; letter-spacing: 1px; min-height: 40px; }
+        
+        #page-footer { display: none; } 
 
-        .data-value {
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 12px;
-            line-height: 1.1;
-            white-space: normal;
-            word-wrap: break-word;
-            display: block;
-        }
+        /* Tabell-elementer */
+        table.print-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+        thead { display: table-header-group; } 
+        tbody { display: table-row-group; }
+        
+        td.content-cell { padding: 0; border: none; }
 
-        /* --- SKIVE-SEKSJON --- */
-        .targets-wrapper {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0; 
-            min-width: 170px;
-            justify-content: flex-end;
-            padding-right: 15px; 
+        /* Klasse Header */
+        h2.class-header { font-size: 18px; margin-top: 20px; margin-bottom: 5px; padding: 5px 10px; background-color: #f4f4f4; border-left: 5px solid #d31238; }
+        
+        /* Rader */
+        .sheet-container { display: flex; flex-direction: column; border-top: 2px solid #000; margin-bottom: 10px; }
+        
+        .row { 
+            display: flex; align-items: center; justify-content: space-between; 
+            border-bottom: 2px solid #000; padding: 6px 0; 
         }
-
-        .target-unit {
-            position: relative;
-            width: 55px;
-            height: 55px;
-        }
-
-        .circle {
-            width: 55px; height: 55px;
-            border: 2px solid #000; border-radius: 50%;
-            position: relative; background-color: #fff;
-            box-sizing: border-box;
-        }
-        .circle::after {
-            content: "+"; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -55%); color: #ccc;
-            font-size: 20px; font-weight: 300;
-        }
-
-        /* Grå strek mellom sirklene */
-        .target-divider {
-            width: 1px;
+        
+        .athlete-group { display: flex; align-items: center; flex-grow: 1; width: 48%; justify-content: space-between; }
+        .athlete-group.empty { visibility: hidden; }
+        .info-box { flex-grow: 1; padding-right: 10px; min-width: 0; }
+        .input-row { display: flex; align-items: baseline; width: 100%; margin-bottom: 3px; }
+        .input-row:last-child { margin-bottom: 0; }
+        .label { font-weight: bold; font-size: 11px; width: 35px; white-space: nowrap; }
+        .data-container { flex-grow: 1; padding-left: 5px; }
+        .line-border { flex-grow: 1; border-bottom: 1px solid #000; height: 16px; min-width: 50px; }
+        .data-value { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 11px; line-height: 1.1; white-space: normal; word-wrap: break-word; display: block; }
+        
+        /* Blink */
+        .targets-wrapper { display: flex; align-items: center; flex-shrink: 0; min-width: 160px; justify-content: flex-end; padding-right: 10px; }
+        .target-unit { position: relative; width: 50px; height: 50px; }
+        .circle { width: 50px; height: 50px; border: 2px solid #000; border-radius: 50%; position: relative; background-color: #fff; box-sizing: border-box; }
+        
+        /* Ankerpunkt for boks/tekst */
+        .target-divider { 
+            width: 1px; 
             background-color: #ccc; 
-            height: 40px; 
-            margin: 0 22px; 
-            flex-shrink: 0;
+            height: 35px; 
+            margin: 0 20px; 
+            flex-shrink: 0; 
             position: relative; 
             overflow: visible; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
         }
-
-        /* Den lille boksen */
-        .pos-box-center {
-            position: absolute;
-            width: 14px;
-            height: 14px;
-            border: 1px solid #000;
-            background-color: #fff;
-            z-index: 10;
-            top: -20px; 
-            left: 50%;
+        
+        /* Boks (fallback) */
+        .pos-box-center { 
+            position: absolute; 
+            width: 14px; 
+            height: 14px; 
+            border: 1px solid #000; 
+            background-color: #fff; 
+            z-index: 10; 
+            bottom: 100%; 
+            margin-bottom: 2px; 
+            left: 50%; 
             transform: translateX(-50%); 
         }
-
-        /* --- DELELINJE --- */
-        .center-divider {
-            width: 2px; background-color: #000; height: 65px; 
-            margin: 0 10px; flex-shrink: 0; align-self: stretch; 
+        
+        /* H/V TEKST */
+        .pos-text-center {
+            position: absolute;
+            bottom: 100%; 
+            margin-bottom: 2px; 
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            font-size: 16px;
+            background-color: transparent; 
+            border: none;
+            padding: 0;
+            z-index: 10;
+            color: #000;
+            line-height: 1; 
         }
 
-        /* --- SIDESKIFT --- */
-        .page-break {
-            page-break-before: always; break-before: page;
-            height: 50px; display: block; border-top: 2px dashed #999;
-            margin: 20px 0; position: relative;
-        }
-        .page-break::after {
-            content: "SIDESKIFT (Skiller K og M)";
-            position: absolute; top: -12px; left: 50%;
-            transform: translateX(-50%); background: #fff;
-            padding: 0 10px; color: #999; font-size: 12px;
-        }
+        .center-divider { width: 2px; background-color: #000; height: 60px; margin: 0 8px; flex-shrink: 0; align-self: stretch; }
+        
+        /* Sideskift */
+        .page-break { page-break-before: always; break-before: page; height: 50px; display: block; border-top: 2px dashed #999; margin: 20px 0; position: relative; }
+        .page-break::after { content: "NY SIDE"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; color: #999; font-size: 12px; }
 
-        /* --- UTSKRIFTSREGLER --- */
+        /* --- UTSKRIFTSINNSTILLINGER --- */
         @media print {
+            @page {
+                size: A4;
+                margin: 10mm 10mm 30mm 10mm; 
+            }
             body { background-color: white; margin: 0; padding: 0; }
             #control-panel { display: none; }
-            
-            #document-preview {
-                width: 100%; max-width: none; margin: 0; padding: 0;
-                box-shadow: none; padding-bottom: 25mm; 
-            }
-
-            .top-logo { display: none; } /* Skjul topplogo på print */
-
+            #document-preview { width: 100%; max-width: none; margin: 0; padding: 0; box-shadow: none; }
+            .top-logo { display: none; } 
             .page-break { border: none; margin: 0; height: 0; }
             .page-break::after { display: none; }
             
-            #page-footer {
-                display: flex !important; position: fixed; bottom: 0;
-                left: 0; right: 0; height: 20mm; 
-                justify-content: center; align-items: center;
+            #page-footer { 
+                display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; 
+                height: 20mm; justify-content: center; align-items: center; 
                 background: white; z-index: 1000;
             }
             #page-footer img { max-height: 15mm; max-width: 300px; }
+            
+            /* SIKRE AT TING IKKE DELES OPP */
+            .row, .manual-section-row {
+                page-break-inside: avoid; break-inside: avoid;
+            }
+
+            /* HER ER LIMET: Hold overskrift sammen med listen */
+            tr.header-row {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            tr.header-row + tr {
+                page-break-before: avoid !important;
+                break-before: avoid !important;
+            }
 
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
-
     <div id="control-panel">
         <img src="logo.png" alt="NTG Logo" class="panel-header-logo" onerror="this.style.display='none'">
         <br>
-        <h2 class="panel-title">Plotteskjema for NTG Skiskyting</h2>
+        <h2 class="panel-title">Plotteskjema for NTG-GEILO</h2>
         
         <div class="input-group">
             <label for="eventName">Arrangementsnavn (Valgfritt):</label>
             <input type="text" id="eventName" placeholder="F.eks. Norgescup Geilo" autocomplete="off">
-            <div class="instruction-text">Standard: "Plotteskjema for NTG Skiskyting".</div>
         </div>
-
+        
         <div class="input-group">
-            <label for="xmlInput">Last opp startliste (XML):</label>
-            <div class="instruction-text">
-                Last ned <strong>ET6 deltakerliste</strong> fra EQ Timing under filer på deltakersiden.
-            </div>
+            <label for="xmlInput">Last opp Startliste (XML):</label>
+            <div class="instruction-text">Last ned <strong>ET6 deltakerliste</strong> fra EQ Timing.</div>
             <img src="eq.png" alt="Viser filvalg på EQ Timing" class="instruction-img" onerror="this.style.display='none'">
             <input type="file" id="xmlInput" accept=".xml">
         </div>
-
         <button id="printBtn" class="action-btn hidden" onclick="window.print()">Skriv ut skjema</button>
         <div id="statusMsg" style="margin-top:15px; font-weight: bold;"></div>
     </div>
-
-    <div id="page-footer">
-        <img src="logo.png" alt="NTG Logo">
-    </div>
-
-    <div id="document-preview">
-        <div class="header-section">
-            <img src="logo.png" alt="NTG Logo" class="top-logo" onerror="this.style.display='none'">
-            <h1 class="main-title" id="pageTitle">Plotteskjema for NTG Skiskyting</h1>
-        </div>
-
-        <div id="dynamic-content"></div>
-    </div>
-
+    <div id="page-footer"><img src="logo.png" alt="NTG Logo"></div>
+    <div id="document-preview"><div id="dynamic-content"></div></div>
     <script>
-        const titleInput = document.getElementById('eventName');
-        const pageTitle = document.getElementById('pageTitle');
-        const defaultTitle = "Plotteskjema for NTG Skiskyting";
+        // --- HARDKODET DATA GENERERT AV PYTHON ---
+        const HARDCODED_SHOOTING_DATA = {
+            "abel kvelvane": { L: "H", S: "H" },
+            "anders sylling": { L: "H", S: "H" },
+            "andrea heimdal aase": { L: "H", S: "H" },
+            "andrea sørheim almeland": { L: "V", S: "H" },
+            "aurora oldertrøen": { L: "V", S: "V" },
+            "birk tvenge": { L: "V", S: "H" },
+            "charlotte hopsnes": { L: "V", S: "V" },
+            "christoffer jensrud": { L: "H", S: "H" },
+            "håkon auale lundvall": { L: "V", S: "H" },
+            "ingeborg henanger halvorsen": { L: "V", S: "V" },
+            "ingrid knippen kvernsmyr": { L: "V", S: "H" },
+            "iselin lappegard": { L: "V", S: "H" },
+            "kristan broshaug haakenstad": { L: "H", S: "H" },
+            "kristin hopsnes": { L: "V", S: "H" },
+            "linea skjellaug gundersen": { L: "H", S: "H" },
+            "lykke kvien lillemæhlum": { L: "H", S: "H" },
+            "mikkel øyo simonsen": { L: "V", S: "H" },
+            "semine haavaag haakonsen": { L: "H", S: "H" },
+            "sofia bjønnes": { L: "H", S: "H" },
+            "sondre brenna": { L: "H", S: "H" },
+            "synne oma engevik": { L: "H", S: "V" },
+            "thelma brathagen": { L: "V", S: "H" },
+            "thomas hørthe": { L: "H", S: "H" },
+            "tuva knutsen bakkelund": { L: "H", S: "H" },
+            "guro espeli": { L: "H", S: "H" },
+            "thelma brathagen": { L: "V", S: "H" },
+            "lykke kvien lillemæhlum": { L: "H", S: "H" },
+            "iselin lappegard": { L: "V", S: "H" },
+            "sander steen": { L: "V", S: "V" },
+            "nanna tuperna møller": { L: "H", S: "H" },
+            "ingeborg rørvik": { L: "V", S: "H" },
+            "nils vetle zahl eriksson": { L: "V", S: "V" },
+            "ingri gjelland": { L: "H", S: "H" },
+            "tuva gundersen leivestad": { L: "H", S: "H" },
+            "ida frøysland": { L: "V", S: "H" },
+            "marius jahre lund": { L: "H", S: "" },
+            "alexander fodstad": { L: "V", S: "" },
+            "erlend lundsett fredriksen": { L: "H", S: "H" },
+            "kristian broshaug haakenstad": { L: "V", S: "" },
 
-        titleInput.addEventListener('input', function() {
-            const val = this.value.trim();
-            pageTitle.innerText = val.length > 0 ? val : defaultTitle;
-        });
+        };
+        // -----------------------------------------
+
+        // GLOBALE VARIABLER
+        let shootingData = HARDCODED_SHOOTING_DATA;
+        let xmlContentCache = null; 
+        const titleInput = document.getElementById('eventName');
+        const TEAM_FILTER = "ntg-geilo"; 
 
         document.getElementById('xmlInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
-                try {
-                    processXML(e.target.result);
-                } catch (err) {
-                    alert("Feil ved lesing av filen.");
-                    console.error(err);
-                }
+                xmlContentCache = e.target.result;
+                try { processXML(xmlContentCache); } 
+                catch (err) { alert("Feil ved lesing av XML."); console.error(err); }
             };
             reader.readAsText(file);
+        });
+
+        titleInput.addEventListener('input', function() {
+            if (xmlContentCache) { processXML(xmlContentCache); }
         });
 
         function processXML(xmlText) {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
             const starts = xmlDoc.getElementsByTagName("start");
-            
             const rawClasses = {};
             let totalAthletes = 0;
 
@@ -336,21 +257,16 @@
                 const team = (s.getAttribute("team") || "").toLowerCase();
                 const teamAbb = (s.getAttribute("teamabb") || "").toLowerCase();
                 
-                if (team.includes("ntg-geilo") || teamAbb.includes("ntg-geilo")) {
+                if (team.includes(TEAM_FILTER) || teamAbb.includes(TEAM_FILTER)) {
                     const klasse = s.getAttribute("klasse");
                     const startNr = parseInt(s.getAttribute("startno"), 10) || 99999;
                     const startTid = s.getAttribute("starttid") || "";
-
                     const utover = {
-                        nr: startNr, 
-                        nrString: s.getAttribute("startno"), 
+                        nr: startNr, nrString: s.getAttribute("startno"), 
                         navn: s.getAttribute("fornavn") + " " + s.getAttribute("etternavn"),
                         startTid: startTid 
                     };
-
-                    if (!rawClasses[klasse]) {
-                        rawClasses[klasse] = [];
-                    }
+                    if (!rawClasses[klasse]) { rawClasses[klasse] = []; }
                     rawClasses[klasse].push(utover);
                     totalAthletes++;
                 }
@@ -362,164 +278,191 @@
             const printBtn = document.getElementById('printBtn');
 
             if (totalAthletes === 0) {
-                statusDiv.innerText = "Ingen utøvere funnet.";
+                statusDiv.innerText = "Ingen utøvere funnet fra " + TEAM_FILTER; 
                 statusDiv.style.color = "red";
-                printBtn.classList.add('hidden');
-                return;
+                printBtn.classList.add('hidden'); return;
             }
 
             let classList = Object.keys(rawClasses).map(className => {
                 const athletes = rawClasses[className];
                 athletes.sort((a, b) => a.nr - b.nr);
                 const minStartNr = athletes.length > 0 ? athletes[0].nr : 99999;
-
-                return {
-                    name: className,
-                    athletes: athletes,
-                    minStartNr: minStartNr,
-                    isFemale: className.trim().toUpperCase().startsWith('K')
-                };
+                return { name: className, athletes: athletes, minStartNr: minStartNr, isFemale: className.trim().toUpperCase().startsWith('K') };
             });
 
             const femaleClasses = classList.filter(c => c.isFemale);
             const maleClasses = classList.filter(c => !c.isFemale);
-
             femaleClasses.sort((a, b) => a.minStartNr - b.minStartNr);
             maleClasses.sort((a, b) => a.minStartNr - b.minStartNr);
 
-            function renderClassList(list) {
-                list.forEach(classObj => {
-                    const header = document.createElement('h2');
-                    header.className = 'class-header';
-                    header.innerText = "Klasse: " + classObj.name;
-                    container.appendChild(header);
+            // 1. GENERER LIGGENDE (I EN TABELL)
+            generateFullSet(container, femaleClasses, maleClasses, "Liggende");
+            
+            // Sideskift mellom Ligg og Stå
+            const mainPageBreak = document.createElement('div');
+            mainPageBreak.className = 'page-break';
+            container.appendChild(mainPageBreak);
 
-                    const classContainer = document.createElement('div');
-                    classContainer.className = 'sheet-container';
+            // 2. GENERER STÅENDE (I EN NY TABELL)
+            generateFullSet(container, femaleClasses, maleClasses, "Stående");
 
-                    const athletes = classObj.athletes;
-                    for (let i = 0; i < athletes.length; i += 2) {
-                        const left = athletes[i];
-                        const right = athletes[i+1];
-
-                        const row = document.createElement('div');
-                        row.className = 'row';
-
-                        row.innerHTML += createAthleteHTML(left);
-                        row.innerHTML += `<div class="center-divider"></div>`;
-
-                        if (right) {
-                            row.innerHTML += createAthleteHTML(right);
-                        } else {
-                            row.innerHTML += `<div class="athlete-group empty"></div>`;
-                        }
-                        classContainer.appendChild(row);
-                    }
-                    container.appendChild(classContainer);
-                });
-            }
-
-            if (femaleClasses.length > 0) renderClassList(femaleClasses);
-            if (femaleClasses.length > 0 && maleClasses.length > 0) {
-                const pageBreak = document.createElement('div');
-                pageBreak.className = 'page-break';
-                container.appendChild(pageBreak);
-            }
-            if (maleClasses.length > 0) renderClassList(maleClasses);
-
-            // --- LEGG TIL MANUELL SEKSJON TIL SLUTT ---
-            renderManualSection(container);
-
-            statusDiv.innerText = `Klar! ${totalAthletes} utøvere.`;
+            statusDiv.innerText = `Klar! ${totalAthletes} utøvere. Generert Liggende og Stående.`;
             statusDiv.style.color = "green";
             printBtn.classList.remove('hidden');
         }
 
-        // Funksjon for å lage blanke rader
-        function renderManualSection(container) {
-            const header = document.createElement('h2');
-            header.className = 'class-header';
-            header.innerText = "Ekstra";
-            container.appendChild(header);
+        function generateFullSet(container, femaleClasses, maleClasses, mode) {
+            const teamDisplay = TEAM_FILTER.charAt(0).toUpperCase() + TEAM_FILTER.slice(1);
+            const baseTitle = titleInput.value.trim() || ("Plotteskjema for " + teamDisplay);
+            const fullTitle = `${baseTitle} - ${mode}`;
+            
+            // OPPRETT TABELL
+            const table = document.createElement('table');
+            table.className = 'print-table';
 
-            const classContainer = document.createElement('div');
-            classContainer.className = 'sheet-container';
+            // THEAD (Gjentas på hver side)
+            const thead = document.createElement('thead');
+            const trHead = document.createElement('tr');
+            const tdHead = document.createElement('td');
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'header-section';
+            headerDiv.innerHTML = `<img src="logo.png" alt="NTG Logo" class="top-logo" onerror="this.style.display='none'"><h1 class="main-title">${fullTitle}</h1>`;
+            
+            tdHead.appendChild(headerDiv);
+            trHead.appendChild(tdHead);
+            thead.appendChild(trHead);
+            table.appendChild(thead);
 
-            // 4 rader = 8 plasser
-            for (let i = 0; i < 4; i++) {
-                const row = document.createElement('div');
-                row.className = 'row';
+            // TBODY (Innhold)
+            const tbody = document.createElement('tbody');
+
+            // 1. KVINNER
+            if (femaleClasses.length > 0) {
+                renderClassList(tbody, femaleClasses, mode);
+                renderManualSection(tbody, mode);
+            }
+
+            // 2. SKILLE
+            if (femaleClasses.length > 0 && maleClasses.length > 0) {
+                const trSep = document.createElement('tr');
+                const tdSep = document.createElement('td');
+                const pb = document.createElement('div');
+                pb.className = 'page-break';
+                tdSep.appendChild(pb);
+                trSep.appendChild(tdSep);
+                tbody.appendChild(trSep);
+            }
+
+            // 3. MENN
+            if (maleClasses.length > 0) {
+                renderClassList(tbody, maleClasses, mode);
+                renderManualSection(tbody, mode);
+            }
+            
+            table.appendChild(tbody);
+            container.appendChild(table);
+        }
+
+        function renderClassList(tbody, list, mode) {
+            list.forEach(classObj => {
+                // Header for klassen (LEGG MERKE TIL .header-row HER)
+                const trHeader = document.createElement('tr');
+                trHeader.className = 'header-row'; // VIKTIG FOR CSS-LIMET
                 
-                row.innerHTML += createBlankAthleteHTML();
-                row.innerHTML += `<div class="center-divider"></div>`;
-                row.innerHTML += createBlankAthleteHTML();
+                const tdHeader = document.createElement('td');
+                tdHeader.className = 'content-cell';
+                const header = document.createElement('h2'); 
+                header.className = 'class-header'; 
+                header.innerText = "Klasse: " + classObj.name; 
                 
+                tdHeader.appendChild(header);
+                trHeader.appendChild(tdHeader);
+                tbody.appendChild(trHeader);
+
+                // Container for radene
+                const trContainer = document.createElement('tr');
+                const tdContainer = document.createElement('td');
+                tdContainer.className = 'content-cell';
+
+                const classContainer = document.createElement('div'); 
+                classContainer.className = 'sheet-container';
+                classContainer.style.borderTop = "2px solid #000"; 
+
+                const athletes = classObj.athletes;
+                for (let i = 0; i < athletes.length; i += 2) {
+                    const left = athletes[i]; const right = athletes[i+1];
+                    const row = document.createElement('div'); row.className = 'row';
+                    row.innerHTML += createAthleteHTML(left, mode);
+                    row.innerHTML += `<div class="center-divider"></div>`;
+                    if (right) { row.innerHTML += createAthleteHTML(right, mode); } else { row.innerHTML += `<div class="athlete-group empty"></div>`; }
+                    classContainer.appendChild(row);
+                }
+                
+                tdContainer.appendChild(classContainer);
+                trContainer.appendChild(tdContainer);
+                tbody.appendChild(trContainer);
+            });
+        }
+
+        function renderManualSection(tbody, mode) {
+            const trHeader = document.createElement('tr');
+            trHeader.className = 'manual-section-row header-row'; // Lim for denne også
+            const tdHeader = document.createElement('td');
+            tdHeader.className = 'content-cell';
+            const header = document.createElement('h2'); header.className = 'class-header'; header.innerText = `Manuell registrering / Reserver`; 
+            tdHeader.appendChild(header);
+            trHeader.appendChild(tdHeader);
+            tbody.appendChild(trHeader);
+
+            const trContainer = document.createElement('tr');
+            trContainer.className = 'manual-section-row';
+            const tdContainer = document.createElement('td');
+            tdContainer.className = 'content-cell';
+
+            const classContainer = document.createElement('div'); classContainer.className = 'sheet-container';
+            classContainer.style.borderTop = "2px solid #000";
+
+            for (let i = 0; i < 2; i++) {
+                const row = document.createElement('div'); row.className = 'row';
+                row.innerHTML += createBlankAthleteHTML(); row.innerHTML += `<div class="center-divider"></div>`; row.innerHTML += createBlankAthleteHTML();
                 classContainer.appendChild(row);
             }
-            container.appendChild(classContainer);
+            tdContainer.appendChild(classContainer);
+            trContainer.appendChild(tdContainer);
+            tbody.appendChild(trContainer);
         }
 
-        // HTML for en utøver med data
-        function createAthleteHTML(athlete) {
-            return `
-                <div class="athlete-group">
-                    <div class="info-box">
-                        <div class="input-row">
-                            <span class="label">Nr:</span>
-                            <div class="data-container"><span class="data-value">${athlete.nrString}</span></div>
-                        </div>
-                        <div class="input-row">
-                            <span class="label">Navn:</span>
-                            <div class="data-container"><span class="data-value">${athlete.navn}</span></div>
-                        </div>
-                        <div class="input-row">
-                            <span class="label">Tid:</span>
-                            <div class="data-container"><span class="data-value">${athlete.startTid}</span></div>
-                        </div>
-                    </div>
-                    ${createTargetsHTML()}
-                </div>
-            `;
-        }
-
-        // HTML for blank utøver (med skrivelinjer)
         function createBlankAthleteHTML() {
-            return `
-                <div class="athlete-group">
-                    <div class="info-box">
-                        <div class="input-row">
-                            <span class="label">Nr:</span>
-                            <div class="line-border"></div>
-                        </div>
-                        <div class="input-row">
-                            <span class="label">Navn:</span>
-                            <div class="line-border"></div>
-                        </div>
-                        <div class="input-row">
-                            <span class="label">Tid:</span>
-                            <div class="line-border"></div>
-                        </div>
-                    </div>
-                    ${createTargetsHTML()}
-                </div>
-            `;
+            return `<div class="athlete-group"><div class="info-box"><div class="input-row"><span class="label">Nr:</span><div class="line-border"></div></div><div class="input-row"><span class="label">Navn:</span><div class="line-border"></div></div><div class="input-row"><span class="label">Tid:</span><div class="line-border"></div></div></div>${createTargetsHTML(null, null)} </div>`;
         }
 
-        // Felles HTML for sirkel-oppsettet
-        function createTargetsHTML() {
-            return `
-                <div class="targets-wrapper">
-                    <div class="target-unit">
-                        <div class="circle"></div>
-                    </div>
-                    <div class="target-divider">
-                        <div class="pos-box-center"></div>
-                    </div>
-                    <div class="target-unit">
-                        <div class="circle"></div>
-                    </div>
-                </div>
-            `;
+        function createAthleteHTML(athlete, mode) {
+            return `<div class="athlete-group"><div class="info-box"><div class="input-row"><span class="label">Nr:</span><div class="data-container"><span class="data-value">${athlete.nrString}</span></div></div><div class="input-row"><span class="label">Navn:</span><div class="data-container"><span class="data-value">${athlete.navn}</span></div></div><div class="input-row"><span class="label">Tid:</span><div class="data-container"><span class="data-value">${athlete.startTid}</span></div></div></div>${createTargetsHTML(athlete.navn, mode)}</div>`;
+        }
+
+        function finnSkytterSmart(xmlNavn) {
+            if (!xmlNavn) return null;
+            const cleanXml = xmlNavn.toLowerCase();
+            if (shootingData[cleanXml]) return shootingData[cleanXml];
+            for (const dbName in shootingData) {
+                const dbParts = dbName.split(" "); 
+                const match = dbParts.every(part => cleanXml.includes(part));
+                if (match) { return shootingData[dbName]; }
+            }
+            return null;
+        }
+
+        function createTargetsHTML(name, mode) {
+            let centerElement = `<div class="pos-box-center"></div>`; 
+            const data = finnSkytterSmart(name);
+            if (data) {
+                let dir = "";
+                if (mode === "Liggende") dir = data.L;
+                if (mode === "Stående") dir = data.S;
+                if (dir) { centerElement = `<div class="pos-text-center">${dir}</div>`; }
+            }
+            return `<div class="targets-wrapper"><div class="target-unit"><div class="circle"></div></div><div class="target-divider">${centerElement}</div><div class="target-unit"><div class="circle"></div></div></div>`;
         }
     </script>
 </body>
