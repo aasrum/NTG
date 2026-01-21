@@ -3,95 +3,109 @@ import pdfplumber
 import pandas as pd
 import re
 
-# Tittel på siden
-st.set_page_config(page_title="Startliste PDF til CSV", layout="centered")
-st.title("🎿 Startliste Konverterer")
-st.write("Last opp startlisten (PDF), så henter jeg ut NTG-utøverne og lager en CSV.")
+st.set_page_config(page_title="Startliste Fix", layout="wide") # Bruker bredere layout
+st.title("🎿 Startliste Konverterer (Alle + NTG)")
 
-# Filopplaster
-uploaded_file = st.file_uploader("Last opp PDF her", type="pdf")
+col1, col2 = st.columns([1, 2])
+with col1:
+    uploaded_file = st.file_uploader("Last opp PDF startliste", type="pdf")
 
-def extract_data_from_pdf(file):
+def extract_all_data(file):
     extracted_rows = []
     
     with pdfplumber.open(file) as pdf:
         for page in pdf.pages:
-            text = page.extract_text()
+            # layout=True er viktig for å skille kolonner
+            text = page.extract_text(layout=True)
             if not text:
                 continue
             
             lines = text.split('\n')
             
             for line in lines:
-                # Vi sjekker først om linjen kan inneholde en NTG-utøver
-                if "NTG" in line:
+                # Vi splitter linjen der det er 2 eller flere mellomrom
+                parts = re.split(r'\s{2,}', line.strip())
+                
+                # Vi ser etter linjer som har minst 3 deler: Startnr ... Klubb ... Tid
+                if len(parts) >= 3:
+                    startnr = parts[0]
+                    tid = parts[-1]
                     
-                    # LOGIKK-ENDRING:
-                    # I stedet for regex som gjetter, splitter vi linjen der det er 
-                    # 2 eller flere mellomrom. Dette skiller kolonnene mye tryggere.
-                    parts = re.split(r'\s{2,}', line.strip())
-                    
-                    # En typisk rad skal da bli seende slik ut i 'parts':
-                    # ['113', 'Edvard Pålssønn Strømsæther', 'Nesodden IF / NTG-G', '11:56:30']
-                    # Noen ganger kan det være flere deler, så vi må være litt fleksible.
-                    
-                    if len(parts) >= 3:
-                        # Vi antar at siste felt er TID og første felt er STARTNUMMER
-                        tid = parts[-1]
-                        startnr = parts[0]
+                    # Enkel validering: Startnr må være tall, Tid må ha kolon
+                    if startnr.isdigit() and ":" in tid:
                         
-                        # Dobbeltsjekk at det ser riktig ut (startnr er tall, tid har kolon)
-                        if startnr.isdigit() and ":" in tid:
-                            
-                            # Klubben er vanligvis nest siste felt
-                            klubb = parts[-2]
-                            
-                            # Navnet er alt som ligger mellom startnr og klubb
-                            # (Vi slår sammen med mellomrom i tilfelle navnet ble delt opp)
-                            navn = " ".join(parts[1:-2])
-                            
-                            # Sjekk at det faktisk er NTG-utøveren vi fant
-                            if "NTG" in klubb or "NTG" in navn:
-                                row = {
-                                    "Navn": navn.strip(),
-                                    "Startnummer": startnr,
-                                    "Klubb/Team": klubb.strip(),
-                                    "Starttid": tid
-                                }
-                                extracted_rows.append(row)
+                        # LOGIKK FOR Å SKILLE NAVN OG KLUBB:
+                        # Vi antar at "Tid" er siste element.
+                        # Vi antar at "Klubb" er elementet FØR tiden (nest sist).
+                        # Vi antar at "Navn" er alt mellom Startnr og Klubb.
+                        
+                        # Hent ut delene
+                        klubb_del = parts[-2]
+                        # Slå sammen alle deler mellom startnr (indeks 0) og klubb (indeks -2) til navn
+                        navn_del = " ".join(parts[1:-2])
+                        
+                        # Hvis navn ble tomt (f.eks. hvis listen bare har [Nr, NavnOgKlubb, Tid]),
+                        # må vi gjøre en justering. Men med layout=True er de oftest adskilt.
+                        if not navn_del: 
+                            # Fallback: Kanskje del 1 inneholder både navn og klubb?
+                            # Vi lar det stå slik for nå, da layout=True oftest løser dette.
+                            navn_del = parts[1] 
+                            if len(parts) == 3: # Hvis vi bare har 3 deler totalt
+                                klubb_del = "" # Klarte ikke skille ut klubb
+
+                        row = {
+                            "Startnummer": int(startnr), # Lagrer som tall for sortering
+                            "Navn": navn_del.strip(),
+                            "Klubb/Team": klubb_del.strip(),
+                            "Starttid": tid
+                        }
+                        extracted_rows.append(row)
 
     return extracted_rows
 
-if uploaded_file is not None:
-    with st.spinner('Leser PDF...'):
-        try:
-            data = extract_data_from_pdf(uploaded_file)
+if uploaded_file:
+    with st.spinner('Leser hele startlisten...'):
+        all_data = extract_all_data(uploaded_file)
+        
+        if all_data:
+            # 1. LAG FULL LISTE
+            df_all = pd.DataFrame(all_data)
+            df_all = df_all.sort_values(by='Starttid')
             
-            if data:
-                # Lag DataFrame
-                df = pd.DataFrame(data)
-                
-                # Sorter etter Starttid
-                df = df.sort_values(by='Starttid')
-                
-                # Legg til nummerering (Nr. 1, 2, 3...)
-                df.insert(0, 'Nr.', range(1, 1 + len(df)))
-                
-                # Vis tabellen på skjermen
-                st.success(f"Fant {len(df)} utøvere fra NTG!")
-                st.dataframe(df, hide_index=True)
-                
-                # Konverter til CSV for nedlasting
-                csv = df.to_csv(index=False).encode('utf-8')
-                
+            # Legg til rangering/rekkefølge
+            df_all.insert(0, 'Nr.', range(1, 1 + len(df_all)))
+
+            # 2. LAG NTG-FILTERT LISTE
+            # Vi filtrerer der Klubb/Team inneholder "NTG" (case insensitive)
+            df_ntg = df_all[df_all['Klubb/Team'].str.contains("NTG", case=False, na=False)].copy()
+            # Renummerer NTG-listen fra 1
+            df_ntg['Nr.'] = range(1, 1 + len(df_ntg))
+            
+            # --- VISNING ---
+            
+            st.success(f"Fant totalt {len(df_all)} startende ({len(df_ntg)} fra NTG).")
+            
+            tab1, tab2 = st.tabs(["Hele Startlisten", "Kun NTG"])
+            
+            with tab1:
+                st.dataframe(df_all, hide_index=True, use_container_width=True)
+                csv_all = df_all.to_csv(index=False).encode('utf-8')
                 st.download_button(
-                    label="📥 Last ned CSV-fil",
-                    data=csv,
+                    label="📥 Last ned HELE listen (.csv)",
+                    data=csv_all,
+                    file_name="Hele_Startlisten.csv",
+                    mime="text/csv",
+                )
+                
+            with tab2:
+                st.dataframe(df_ntg, hide_index=True, use_container_width=True)
+                csv_ntg = df_ntg.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="📥 Last ned kun NTG (.csv)",
+                    data=csv_ntg,
                     file_name="NTG_utovere.csv",
                     mime="text/csv",
                 )
-            else:
-                st.warning("Fant ingen utøvere med 'NTG' i klubbnavnet på linjer som kunne leses. Sjekk om PDF-en er et bilde eller tekst.")
                 
-        except Exception as e:
-            st.error(f"En feil oppstod: {e}")
+        else:
+            st.warning("Fant ingen lesbare rader. Sjekk PDF-formatet.")
