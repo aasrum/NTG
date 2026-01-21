@@ -16,42 +16,49 @@ def extract_data_from_pdf(file):
     
     with pdfplumber.open(file) as pdf:
         for page in pdf.pages:
-            # Vi henter ut teksten linje for linje
             text = page.extract_text()
             if not text:
                 continue
             
             lines = text.split('\n')
             
-            # Regex for å finne linjer som ser ut som en startende utøver
-            # Ser etter: Startnr (tall) + Navn + Klubb + Tid (XX:XX:XX)
-            # Dette er en generell pattern som må justeres hvis PDF-formatet endrer seg drastisk
             for line in lines:
-                # Sjekk om linjen inneholder "NTG" før vi bruker tid på å parse den
+                # Vi sjekker først om linjen kan inneholde en NTG-utøver
                 if "NTG" in line:
-                    # Enkel logikk: Vi antar at linjen slutter med tid (00:00:00) og starter med startnummer
-                    # Eksempel linje: "113 Edvard Strømsæther Nesodden IF / NTG-G 11:56:30"
                     
-                    # Regex for å fange opp strukturen
-                    match = re.search(r'^(\d+)\s+(.+?)\s+(.+?)\s+(\d{2}:\d{2}:\d{2})$', line)
+                    # LOGIKK-ENDRING:
+                    # I stedet for regex som gjetter, splitter vi linjen der det er 
+                    # 2 eller flere mellomrom. Dette skiller kolonnene mye tryggere.
+                    parts = re.split(r'\s{2,}', line.strip())
                     
-                    if match:
-                        startnr, navn, klubb, tid = match.groups()
+                    # En typisk rad skal da bli seende slik ut i 'parts':
+                    # ['113', 'Edvard Pålssønn Strømsæther', 'Nesodden IF / NTG-G', '11:56:30']
+                    # Noen ganger kan det være flere deler, så vi må være litt fleksible.
+                    
+                    if len(parts) >= 3:
+                        # Vi antar at siste felt er TID og første felt er STARTNUMMER
+                        tid = parts[-1]
+                        startnr = parts[0]
                         
-                        # Dobbeltsjekk at det faktisk er en NTG-utøver i klubbnavnet (for sikkerhets skyld)
-                        if "NTG" in klubb or "NTG" in navn: # Noen ganger havner klubb i navnefeltet ved feilparsing
+                        # Dobbeltsjekk at det ser riktig ut (startnr er tall, tid har kolon)
+                        if startnr.isdigit() and ":" in tid:
                             
-                            # Prøv å finne årsklasse basert på startnummer eller kontekst hvis mulig
-                            # Siden årsklasse ofte står i en overskrift over tabellen, er det vanskelig å fange per linje.
-                            # Vi setter den som "Ukjent/Se startnr" eller lar bruker fylle ut, 
-                            # men for enkelhets skyld i denne koden utelater vi den eller setter den generisk.
-                            row = {
-                                "Navn": navn.strip(),
-                                "Startnummer": startnr,
-                                "Klubb/Team": klubb.strip(),
-                                "Starttid": tid
-                            }
-                            extracted_rows.append(row)
+                            # Klubben er vanligvis nest siste felt
+                            klubb = parts[-2]
+                            
+                            # Navnet er alt som ligger mellom startnr og klubb
+                            # (Vi slår sammen med mellomrom i tilfelle navnet ble delt opp)
+                            navn = " ".join(parts[1:-2])
+                            
+                            # Sjekk at det faktisk er NTG-utøveren vi fant
+                            if "NTG" in klubb or "NTG" in navn:
+                                row = {
+                                    "Navn": navn.strip(),
+                                    "Startnummer": startnr,
+                                    "Klubb/Team": klubb.strip(),
+                                    "Starttid": tid
+                                }
+                                extracted_rows.append(row)
 
     return extracted_rows
 
